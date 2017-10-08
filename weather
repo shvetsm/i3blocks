@@ -1,0 +1,61 @@
+#!/bin/bash
+# Based on http://openweathermap.org/current
+
+API_KEY="4df99cda6022071432d72bf1fe8409e5"
+
+# Check on http://openweathermap.org/find
+CITY_ID="4560349"
+#CITY_ID="${BLOCK_INSTANCE}"
+
+URGENT_LOWER=40
+URGENT_HIGHER=90
+
+ICON_SUNNY=""
+ICON_CLOUDY=""
+ICON_RAINY=""
+ICON_STORM=""
+ICON_SNOW=""
+ICON_FOG=""
+
+SYMBOL_CELSIUS="℉"
+
+WEATHER_URL="http://api.openweathermap.org/data/2.5/weather?id=${CITY_ID}&appid=${API_KEY}&units=imperial"
+
+WEATHER_INFO=$(wget -qO- "${WEATHER_URL}")
+WEATHER_MAIN=$(echo "${WEATHER_INFO}" | grep -o -e '\"main\":\"[a-Z]*\"' | awk -F ':' '{print $2}' | tr -d '"')
+WEATHER_TEMP=$(echo "${WEATHER_INFO}" | grep -o -e '\"temp\":\-\?[0-9]*' | awk -F ':' '{print $2}' | tr -d '"')
+TEMP_STR=""
+
+if [[ "${WEATHER_TEMP}" -lt "${URGENT_LOWER}" ]] ; then
+  TEMP_STR="<span foreground='#5f819d'>${WEATHER_TEMP}${SYMBOL_CELSIUS}</span>"
+elif [[ "${WEATHER_TEMP}" -gt "${URGENT_HIGHER}" ]]; then
+  TEMP_STR="<span foreground='#cc6666'>${WEATHER_TEMP}${SYMBOL_CELSIUS}</span>"
+else
+  TEMP_STR="<span foreground='#b5bd68'>${WEATHER_TEMP}${SYMBOL_CELSIUS}</span>"
+fi
+
+if [[ "${WEATHER_MAIN}" = *Snow* ]]; then
+  echo "<span foreground='#8abeb7'>${ICON_SNOW}</span> ${TEMP_STR}"
+  echo "<span foreground='#8abeb7'>${ICON_SNOW}</span> ${TEMP_STR}"
+  echo "";
+elif [[ "${WEATHER_MAIN}" = *Rain* ]] || [[ "${WEATHER_MAIN}" = *Drizzle* ]]; then
+  echo "<span foreground='#5f819d'>${ICON_RAINY}</span> ${TEMP_STR}"
+  echo "<span foreground='#5f819d'>${ICON_RAINY}</span> ${TEMP_STR}"
+  echo "";
+elif [[ "${WEATHER_MAIN}" = *Cloud* ]]; then
+  echo "<span foreground='#81a2be'>${ICON_CLOUDY}</span> ${TEMP_STR}"
+  echo "<span foreground='#81a2be'>${ICON_CLOUDY}</span> ${TEMP_STR}"
+  echo "";
+elif [[ "${WEATHER_MAIN}" = *Clear* ]]; then
+  echo "<span foreground='#f0c674'>${ICON_SUNNY}</span> ${TEMP_STR}"
+  echo "<span foreground='#f0c674'>${ICON_SUNNY}</span> ${TEMP_STR}"
+  echo "";
+elif [[ "${WEATHER_MAIN}" = *Fog* ]] || [[ "${WEATHER_MAIN}" = *Mist* ]]; then
+  echo "<span foreground='#898989'>${ICON_FOG}</span> ${TEMP_STR}"
+  echo "<span foreground='#898989'>${ICON_FOG}</span> ${TEMP_STR}"
+  echo "";
+else
+  echo "<span foreground='#85678f'>${WEATHER_MAIN}</span> ${TEMP_STR}"
+  echo "<span foreground='#85678f'>${WEATHER_MAIN}</span> ${TEMP_STR}"
+  echo ""
+fi

@@ -1,0 +1,3 @@
+#!/bin/bash
+PLAYING=$($HOME/.config/i3/scripts/playing.py --layout A-t)
+echo "<span foreground='#b5bd68'>${PLAYING}</span>"

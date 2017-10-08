@@ -1,0 +1,4 @@
+#!/bin/bash
+
+SYMBOL=$(xkblayout-state print "%n")
+echo '<span foreground="#b5bd68">'$SYMBOL'</span>'

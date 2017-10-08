@@ -1,0 +1,30 @@
+#!/bin/bash
+
+BATTERY=0
+BATTERY_INFO=$(upower -i /org/freedesktop/UPower/devices/battery_BAT0)
+BATTERY_STATE=$(echo "${BATTERY_INFO}" | grep "state:" | grep -wo "full\|charging\|discharging")
+BATTERY_POWER=$(echo "${BATTERY_INFO}" | grep percentage | cut -c26-30 | tr -d %)
+
+WARN_VALUE=30
+URGENT_VALUE=10
+COLOR="#b5bd68"
+if [[ "${BATTERY_POWER}" -le "${URGENT_VALUE}" ]]; then
+  COLOR="#cc6666"
+elif [[ "${BATTERY_POWER}" -le "${WARN_VALUE}" ]] ; then
+  COLOR="#f0c674"
+fi
+
+if [[ "${BATTERY_STATE}" = "charging" ]]; then
+  echo "<span foreground='${COLOR}'>${BATTERY_POWER}%+</span>"
+  echo ""
+elif [[ "${BATTERY_STATE}" = "discharging" ]]; then
+  echo "<span foreground='${COLOR}'>${BATTERY_POWER}%-</span>"
+  echo ""
+else
+  echo "<span foreground='${COLOR}'>${BATTERY_POWER}%</span>"
+  echo ""
+fi
+
+if [[ "${BATTERY_POWER}" -le "${URGENT_VALUE}" ]]; then
+  exit 33
+fi
